@@ -29,10 +29,15 @@ npm start
 
 <h2 align="center">Alguns gifs.</h2>
 
-![](gifs/cbt-readme1.gif)
+<p align="center"> 
+  <img src = "gifs/cbt-readme1.gif"/>
+</p> 
 
-![](gifs/cbt-readme2.gif)
+<p align="center"> 
+  <img src = "gifs/cbt-readme2.gif"/>
+</p> 
 
-![](gifs/cbt-readme3.gif)
-
+<p align="center"> 
+  <img src = "gifs/cbt-readme3.gif"/>
+</p> 
 
