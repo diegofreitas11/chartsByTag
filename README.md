@@ -26,3 +26,13 @@ npm start
 ```
 
 4. Acesse 'localhost:3000/' no navegador.
+
+<h2 align="center">Alguns gifs.</h2>
+
+![](gifs/cbt-readme1.gif)
+
+![](gifs/cbt-readme2.gif)
+
+![](gifs/cbt-readme3.gif)
+
+
