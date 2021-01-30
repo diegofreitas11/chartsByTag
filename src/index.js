@@ -43,7 +43,7 @@ const UsernameInput = (props) => {
         >
             <input
                 className = 'usernameField' 
-                placeholder ='dale'
+                placeholder = 'Insira o nome de usuário'
                 onChange = {e => setValue(e.target.value)}
                 value = {value}
                 disabled = {!props.isFirstScreen}
