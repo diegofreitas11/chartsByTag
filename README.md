@@ -14,7 +14,7 @@ git clone <https://github.com/diegofreitas11/chartsByTag.git>
 2. Acesse a pasta do projeto:
 ```bash
 cd chartByTag
-
+```
 
 3. Rode o projeto em desenvolvimento:
 ```bash
