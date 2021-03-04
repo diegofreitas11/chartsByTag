@@ -1,0 +1,146 @@
+
+
+body{
+    font-family: Roboto, sans-serif;
+}
+
+
+input, button{
+    font-family: Roboto, sans-serif;
+}
+
+
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 90vh;
+    position: relative;
+
+}
+
+.username-input-container{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.username-input-container strong{
+    font-size: 2rem;
+    font-weight: 300;
+    margin: 2rem;
+}
+
+.username-input-container input{ 
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    width: 100%;
+    font-size: 2rem;
+    transition: border 0.3s;
+}
+
+.username-input-container input:focus{
+    border-bottom: 1px solid #195cec;
+}
+
+.username-input-container button,
+.tag-input-container button{
+    border: none;
+    padding: 1rem 2.5rem;
+    background: red;
+    color: white;
+    margin: 1.5rem
+}
+
+.tag-input-container{
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tag-input-container input {
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    font-size: 2rem;
+    transition: border 0.3s;
+    width: 50%;
+}
+
+.tag-input-container input:focus {
+    border-bottom: 1px solid #195cec;
+}
+
+    
+.result-list-container{
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    height: 50%;
+}
+
+.result-list-container div{
+    padding: 0.5rem 3rem;
+    border: 1px solid #cecece;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: 1rem;
+}
+
+.result-list-container div strong{
+    font-size: 2rem;
+    font-weight: lighter;
+}
+
+.result-list-container div p{
+    color: #666;
+}
+
+.loading-overlay-container {
+    width: 100%;
+    height: 100%;
+    background:rgb(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+}
+
+.profile-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 40%;
+    height: 5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #cecece;
+}
+
+.profile-container > div{
+    width: 50%;
+    height: 90%;
+}
+
+.profile-container > div strong{
+    font-size: 2rem;
+}
+
+.profile-container > div p{
+    margin: 0;
+    color: #666;
+}
+
+.profile-container a{
+    align-self: flex-end;
+    cursor: pointer;
+    color: #195cec;
+}
+
+.profile-container img{
+    border-radius: 50%;
+    height: 90%;
+}
+

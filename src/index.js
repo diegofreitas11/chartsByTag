@@ -1,112 +1,15 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import './styles/styles.css';
 import api, { lastfmKey, source } from './services/api';
-import ReactLoading from 'react-loading';
-import ProgressBar from "@ramonak/react-progress-bar";
-
-const ResultList = (props) => {
-    return(
-        <div
-            className = 'list'
-        >
-            {props.list.map((item, index) => {
-                return (
-                    <div
-                        className = {item.visible ? 'card' : 'hiddenCard'}
-                        key = {index.toString()}
-                    >
-                        <span>{index + 1}</span>
-                        {
-                            (item.name.length < 20 && <h1>{item.name}</h1>)
-                            || <h2>{item.name}</h2>
-                        }
-                        
-                        <p>{item.playcount} plays</p>
-                    </div>
-                )
-            })}
-        </div>
-            
-    )
-}
-
-const UsernameInput = (props) => {
-    const [value, setValue] = useState('')
-
-    return(
-        <div
-            className = {
-                props.isFirstScreen ? 
-                'usernameInputColumn' : 'usernameInputRow'
-            }
-        >
-            <input
-                className = 'usernameField' 
-                placeholder = 'Insira o nome de usuário'
-                onChange = {e => setValue(e.target.value)}
-                value = {value}
-                disabled = {!props.isFirstScreen}
-            /> 
-
-            <input
-                className = 'button' 
-                type = 'submit'
-                value = {props.isFirstScreen ? 'Buscar' : 'Mudar user'}
-                onClick = {
-                    props.isFirstScreen ? 
-                    () => props.getList(value) : () => props.backToFirstScreen()
-                }
-            />
-        </div>
-    )
-}
-
-const TagInput = (props) => {
-    const [value, setValue] = useState('')
-
-    return(
-        <div
-            className = 'usernameInputRow'
-        >
-            <input 
-                className = 'usernameField' 
-                placeholder = 'Filtre por tag...'
-                onChange = {e => setValue(e.target.value)}
-                value = {value}
-                disabled = {props.isLoadingInProgress}
-            />
-
-            <input
-                className = 'button' 
-                type = 'submit'
-                value = {props.isLoadingInProgress ? 'Cancelar' : 'Filtrar'}
-                
-                onClick = {
-                    props.isLoadingInProgress ? 
-                    () => props.cancelFetching() : () => props.filter(value)
-                }
-            />
-
-        </div>
-    )
-}
-
-/////////
-
-class Main extends React.Component{
-    constructor(props){
-        super(props)
-        this.state = {
-            isFirstScreen: true,
-            listToRender: [],
-            defaultList: [],
-            username: null,
-            error: false
-        }
-    }
+import { UsernameInput } from './components/UsernameInput';
+import { ResultList } from './components/ResultList';
+import { TagInput } from './components/TagInput';
+import { Profile } from './components/Profile';
+import { LoadingOverlay } from './components/LoadingOverlay';
 
 
+/*
     loadData = async (username) => {
         this.setState({
             isMainTopLoading: true
@@ -244,55 +147,116 @@ class Main extends React.Component{
         })
         this.renderList(this.state.defaultList)
     }
+*/
 
-    render(){
-        var { error, 
-            listToRender, 
-            isFirstScreen, 
-            filteredTopLoadingProgress,
-            isMainTopLoading } = this.state;
 
-        return(
-            <div className = {isFirstScreen ? 'main' : 'mainWithList'}>
-                <UsernameInput
-                    getList = {this.loadData}
-                    isFirstScreen = {isFirstScreen}
-                    backToFirstScreen = {this.backToFirstScreen}
-                />
+const Main = () => {
 
-                {isMainTopLoading &&
-                    <ReactLoading type = 'spin' />       
-                }
+    const [profile, setProfile] = useState(null);
+    const [chart, setChart] = useState(null);
+    const [loading, setLoading] = useState(null);
 
-                {error && <p>Username não encontrado</p>}
+    const fetchTopArtists = async (username) => {
+        setLoading(true);
 
-                {(!isFirstScreen &&
-                    <div className="resultContent">
-                        <TagInput
-                            filter = {this.filter}
-                            isLoadingInProgress = {!!filteredTopLoadingProgress}
-                            cancelFetching = {this.cancelFetching}  
-                        />
-                        
-                        {
-                            (filteredTopLoadingProgress &&
-                                <ProgressBar 
-                                    completed = {filteredTopLoadingProgress}
-                                    width = '200px'
-                                    bgcolor = '#610f0f'
-                                    borderRadius = '0%'
-                                    isLabelVisible = {false}
-                                />
-                            ) || 
-                            <ResultList
-                                list = {listToRender}
-                            />
-                        }
-                    </div>
-                )}
-            </div>
-        ) 
+        try{
+            let result = await api.get(
+                `?api_key=${lastfmKey}&method=user.getinfo&username=${username}&format=json`
+            );
+            
+            console.log(result.data.user);
+            setProfile(result.data.user);
+
+            result = await api.get(
+                `?api_key=${lastfmKey}&method=user.gettopartists&username=${username}&limit=10&format=json`
+            );
+            
+            setChart(result.data.topartists.artist);
+            setLoading(false);
+            console.log(result.data.topartists.artist);
+
+        }catch(e){
+            console.log(e);
+        }
     }
+
+    const filterByTag = async (tag) => {
+
+        setLoading(true);
+        setChart([]);
+
+        try{
+            //let page = 1;
+            let newFilteredList = [];
+
+            let result = await api.get(
+                `?api_key=${lastfmKey}&method=user.gettopartists&username=${profile.name}&limit=100&format=json`
+            );
+
+            let listToFilter = result.data.topartists.artist;
+            
+            let counter = 0;
+            while(newFilteredList.length < 10){
+
+                let result = await api.get(
+                    `?api_key=${lastfmKey}&method=artist.gettoptags&artist=${encodeURIComponent(listToFilter[counter].name)}&format=json`,
+                );
+
+                let topTags = result.data.toptags.tag;
+                
+                let limit = topTags.length >= 5 ? 5 : topTags.length;
+
+                for(var i = 0; i < limit ; i++){
+                    if(topTags[i].name === tag){
+                        newFilteredList.push(listToFilter[counter]);
+                    }
+                }                
+                
+                counter++;
+                 //progresso da barrinha
+            }
+
+            setChart(newFilteredList);
+            setLoading(false);
+
+        }catch(e){
+            console.log(e)
+        }
+    }
+
+    const resetPage = () => {
+        setChart(null);
+        setProfile(null);
+    }
+
+    return(
+        <div className = "container">
+            {chart ? 
+                (
+                    <>
+                    <Profile 
+                        profile = {profile}
+                        resetPage = {resetPage}
+                    />
+
+                    <TagInput 
+                        filterByTag = {(tag) => filterByTag(tag)}
+                    />
+
+                    <ResultList
+                        list = {chart} 
+                    />
+                    </>
+
+                ) : (
+                    <UsernameInput 
+                        fetchTopArtists = {(username) => fetchTopArtists(username)}
+                    />
+                )
+            }
+            {loading && <LoadingOverlay loading={loading}/>}
+        </div>
+    )
 }
 
 ReactDOM.render(<Main />, document.getElementById('root'))
