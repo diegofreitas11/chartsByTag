@@ -7,7 +7,7 @@ import { ResultList } from './components/ResultList';
 import { TagInput } from './components/TagInput';
 import { Profile } from './components/Profile';
 import { LoadingOverlay } from './components/LoadingOverlay';
-
+import LoadingBar from 'react-top-loading-bar'
 
 
 
@@ -16,6 +16,7 @@ const Main = () => {
     const [profile, setProfile] = useState(null);
     const [chart, setChart] = useState(null);
     const [loading, setLoading] = useState(null);
+    const [topBarProgress, setTopBarProgress] = useState(0);
 
     const fetchTopArtists = async (username) => {
         setLoading(true);
@@ -25,7 +26,6 @@ const Main = () => {
                 `?api_key=${lastfmKey}&method=user.getinfo&username=${username}&format=json`
             );
             
-            console.log(result.data.user);
             setProfile(result.data.user);
 
             result = await api.get(
@@ -34,7 +34,6 @@ const Main = () => {
             
             setChart(result.data.topartists.artist);
             setLoading(false);
-            console.log(result.data.topartists.artist);
 
         }catch(e){
             console.log(e);
@@ -47,8 +46,6 @@ const Main = () => {
         setChart([]);
 
         try{
-            //let page = 1;
-            let newFilteredList = [];
 
             let result = await api.get(
                 `?api_key=${lastfmKey}&method=user.gettopartists&username=${profile.name}&limit=100&format=json`
@@ -57,8 +54,9 @@ const Main = () => {
             let listToFilter = result.data.topartists.artist;
             
             let counter = 0;
-            while(newFilteredList.length < 10 && counter !== 100){
+            let filteredList = [];
 
+            while(filteredList.length < 10 && counter !== 100){
                 let result = await api.get(
                     `?api_key=${lastfmKey}&method=artist.gettoptags&artist=${encodeURIComponent(listToFilter[counter].name)}&format=json`,
                 );
@@ -69,19 +67,17 @@ const Main = () => {
 
                 for(var i = 0; i < limit ; i++){
                     if(topTags[i].name === tag){
-                        newFilteredList.push(listToFilter[counter]);
+                        filteredList = filteredList.concat(listToFilter[counter]);
+                        setChart(filteredList);
+                        setLoading(false);
+                        setTopBarProgress(filteredList.length * 10);
                     }
                 }    
 
-
-                setChart(newFilteredList);
-                console.log(chart);
-
                 counter++;
-                 //progresso da barrinha
             }
 
-            setLoading(false);
+            setTopBarProgress(100);
 
         }catch(e){
             console.log(e)
@@ -98,6 +94,12 @@ const Main = () => {
             {chart ? 
                 (
                     <>
+                    <LoadingBar
+                        color = '#000'
+                        progress = {topBarProgress}
+                        onLoaderFinished = {() => setTopBarProgress(0)} 
+                    />
+
                     <Profile 
                         profile = {profile}
                         resetPage = {resetPage}
